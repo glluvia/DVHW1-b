@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#141210;font-family:'Barlow Condensed',sans-serif;display:flex;flex-direction:column;align-items:center;padding:28px 16px 40px}
+h2{font-size:20px;font-weight:700;color:#f0e8d8;margin-bottom:4px;text-align:center}
+.sub{font-size:11px;color:#5a5248;letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px;text-align:center}
+#wrap{width:100%;max-width:960px}
+canvas{display:block;width:100%}
+.source{font-size:10px;color:#4a4038;margin-top:6px;text-align:center}
+</style>
+</head>
+<body>
+<h2>Top Countries by Cell Phone Subscriptions Per 100 People, 2017</h2>
+<div class="sub">Top 10 per region · Line thickness = value · Source: Gapminder / World Bank</div>
+<div id="wrap"><canvas id="c"></canvas></div>
+<div class="source">Values above 100 = multiple SIM cards per person</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+const AD={"regions": {"Europe": [{"name": "Russia", "label": "Russia", "val": 156.0, "coord": [100.0, 60.0]}, {"name": "Kazakhstan", "label": "Kazakhstan", "val": 148.0, "coord": [67.0, 48.0]}, {"name": "Italy", "label": "Italy", "val": 138.0, "coord": [12.6, 42.8]}, {"name": "Germany", "label": "Germany", "val": 133.0, "coord": [10.4, 51.2]}, {"name": "Poland", "label": "Poland", "val": 133.0, "coord": [20.0, 52.0]}, {"name": "Switzerland", "label": "Switzerland", "val": 131.0, "coord": [8.2, 46.8]}, {"name": "Ukraine", "label": "Ukraine", "val": 131.0, "coord": [31.2, 49.0]}, {"name": "Finland", "label": "Finland", "val": 130.0, "coord": [26.0, 64.0]}, {"name": "Sweden", "label": "Sweden", "val": 126.0, "coord": [18.0, 62.0]}, {"name": "Denmark", "label": "Denmark", "val": 125.0, "coord": [10.0, 56.0]}], "N. America": [{"name": "United States", "label": "USA", "val": 123.0, "coord": [-95.7, 37.1]}, {"name": "Mexico", "label": "Mexico", "val": 91.6, "coord": [-102.6, 23.6]}, {"name": "Canada", "label": "Canada", "val": 86.3, "coord": [-96.0, 60.0]}], "L. America": [{"name": "Costa Rica", "label": "Costa Rica", "val": 179.0, "coord": [-83.8, 9.7]}, {"name": "Uruguay", "label": "Uruguay", "val": 148.0, "coord": [-55.8, -32.5]}, {"name": "Trinidad and Tobago", "label": "T&T", "val": 147.0, "coord": [-61.2, 10.7]}, {"name": "Argentina", "label": "Argentina", "val": 141.0, "coord": [-63.6, -38.4]}, {"name": "Panama", "label": "Panama", "val": 129.0, "coord": [-80.8, 8.5]}, {"name": "Colombia", "label": "Colombia", "val": 127.0, "coord": [-74.3, 4.6]}, {"name": "Chile", "label": "Chile", "val": 125.0, "coord": [-71.5, -35.7]}, {"name": "Peru", "label": "Peru", "val": 124.0, "coord": [-75.0, -9.2]}, {"name": "Brazil", "label": "Brazil", "val": 105.0, "coord": [-51.9, -14.2]}, {"name": "Ecuador", "label": "Ecuador", "val": 87.3, "coord": [-78.1, -1.8]}], "Asia": [{"name": "Maldives", "label": "Maldives", "val": 181.0, "coord": [73.5, 3.2]}, {"name": "Thailand", "label": "Thailand", "val": 176.0, "coord": [100.9, 15.9]}, {"name": "Indonesia", "label": "Indonesia", "val": 164.0, "coord": [113.9, -0.8]}, {"name": "Singapore", "label": "Singapore", "val": 147.0, "coord": [103.8, 1.4]}, {"name": "Japan", "label": "Japan", "val": 136.0, "coord": [138.3, 36.2]}, {"name": "Malaysia", "label": "Malaysia", "val": 136.0, "coord": [109.7, 4.2]}, {"name": "New Zealand", "label": "N.Zealand", "val": 136.0, "coord": [172.0, -42.0]}, {"name": "Sri Lanka", "label": "Sri Lanka", "val": 133.0, "coord": [80.7, 7.9]}, {"name": "Vietnam", "label": "Vietnam", "val": 127.0, "coord": [108.3, 14.1]}, {"name": "Mongolia", "label": "Mongolia", "val": 125.0, "coord": [103.8, 46.9]}], "Middle East": [{"name": "United Arab Emirates", "label": "UAE", "val": 209.0, "coord": [53.8, 23.4]}, {"name": "Kuwait", "label": "Kuwait", "val": 176.0, "coord": [47.5, 29.3]}, {"name": "Bahrain", "label": "Bahrain", "val": 158.0, "coord": [50.6, 26.0]}, {"name": "Oman", "label": "Oman", "val": 149.0, "coord": [57.6, 21.5]}, {"name": "Qatar", "label": "Qatar", "val": 146.0, "coord": [51.2, 25.3]}, {"name": "Israel", "label": "Israel", "val": 128.0, "coord": [34.8, 31.0]}, {"name": "Tunisia", "label": "Tunisia", "val": 125.0, "coord": [9.5, 34.0]}, {"name": "Morocco", "label": "Morocco", "val": 123.0, "coord": [-7.1, 31.8]}, {"name": "Saudi Arabia", "label": "Saudi Arabia", "val": 121.0, "coord": [45.1, 24.2]}, {"name": "Algeria", "label": "Algeria", "val": 111.0, "coord": [1.7, 28.0]}], "Africa": [{"name": "Seychelles", "label": "Seychelles", "val": 173.0, "coord": [55.5, -4.6]}, {"name": "South Africa", "label": "South Africa", "val": 155.0, "coord": [25.1, -29.0]}, {"name": "Botswana", "label": "Botswana", "val": 147.0, "coord": [24.7, -22.3]}, {"name": "Mauritius", "label": "Mauritius", "val": 145.0, "coord": [57.6, -20.3]}, {"name": "Gabon", "label": "Gabon", "val": 129.0, "coord": [11.6, -0.8]}, {"name": "Ghana", "label": "Ghana", "val": 126.0, "coord": [-1.0, 7.9]}, {"name": "Namibia", "label": "Namibia", "val": 112.0, "coord": [18.5, -22.0]}, {"name": "Senegal", "label": "Senegal", "val": 102.0, "coord": [-14.5, 14.5]}, {"name": "Zimbabwe", "label": "Zimbabwe", "val": 99.0, "coord": [29.2, -19.0]}, {"name": "Kenya", "label": "Kenya", "val": 85.3, "coord": [37.9, 0.0]}]}, "colors": {"Europe": "#6f63d4", "N. America": "#4a7ec4", "L. America": "#3aaa9e", "Asia": "#c45a48", "Middle East": "#d4943a", "Africa": "#4da84d"}, "year": 2017};
+const canvas = document.getElementById('c');
+const wrap   = document.getElementById('wrap');
+
+function projectMap(lon, lat, cx, cy, mw, mh) {
+  // Tighter lat range to reduce vertical squish
+  const LAT_MAX=72, LAT_MIN=-52;
+  const x = cx - mw/2 + (lon+180)/360*mw;
+  const y = cy - mh/2 + (LAT_MAX-lat)/(LAT_MAX-LAT_MIN)*mh;
+  return [x,y];
+}
+
+async function render() {
+  const dpr = window.devicePixelRatio||1;
+  const CW  = Math.min(wrap.clientWidth, 960);
+  const CH  = Math.round(CW*1.05);
+  canvas.width=CW*dpr; canvas.height=CH*dpr;
+  canvas.style.width=CW+'px'; canvas.style.height=CH+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  ctx.fillStyle='#141210'; ctx.fillRect(0,0,CW,CH);
+
+  const CX=CW/2, CY=CH/2;
+  const MAP_W=CW*0.76, MAP_H=CH*0.55;
+
+  // ── WORLD MAP ──
+  try {
+    const res=await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+    const world=await res.json();
+    topojson.feature(world,world.objects.countries).features.forEach(f=>{
+      ctx.beginPath();
+      const dr=ring=>{
+        let pv=null;
+        ring.forEach(([lon,lat],i)=>{
+          const[x,y]=projectMap(lon,lat,CX,CY,MAP_W,MAP_H);
+          if(pv&&Math.abs(x-pv[0])>MAP_W*0.4){ctx.moveTo(x,y);}
+          else{i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+          pv=[x,y];
+        });
+        ctx.closePath();
+      };
+      const g=f.geometry;
+      if(g.type==='Polygon')g.coordinates.forEach(dr);
+      else if(g.type==='MultiPolygon')g.coordinates.forEach(p=>p.forEach(dr));
+      ctx.fillStyle='#4a4540'; ctx.fill();
+      ctx.strokeStyle='#2a2520'; ctx.lineWidth=0.5; ctx.stroke();
+    });
+  }catch(e){}
+
+  // ── 6 regions around a circle ──
+  // Layout: give each region a proportional arc based on country count
+  const REGIONS = ["Europe","Asia","Middle East","Africa","L. America","N. America"];
+  const totalN  = REGIONS.reduce((s,r)=>(AD.regions[r]||[]).length+s, 0);
+
+  // full circle, small gap between regions
+  const TOTAL_ANGLE = Math.PI*2;
+  const REGION_GAP  = 0.08;
+  const usable      = TOTAL_ANGLE - REGION_GAP*REGIONS.length;
+
+  // angles per country
+  const apc = usable/totalN;
+
+  let startA = -Math.PI/2 + 0.04; // start at top
+  const regMeta = {};
+  REGIONS.forEach(r=>{
+    const n = (AD.regions[r]||[]).length;
+    const span = n*apc;
+    regMeta[r] = { startA, endA: startA+span, midA: startA+span/2, n };
+    startA += span + REGION_GAP;
+  });
+
+  const ARC_R      = Math.min(CW,CH)*0.415;
+  const LABEL_GAP  = CW*0.035;
+  const TICK_LEN   = CW*0.010;
+  const REG_INSET  = CW*0.030;
+
+  // Draw lines first (behind arcs)
+  REGIONS.forEach(region=>{
+    const countries = AD.regions[region]||[];
+    const col       = AD.colors[region];
+    const { startA, endA } = regMeta[region];
+    const n = countries.length;
+
+    countries.forEach((country,ci)=>{
+      const angle = startA + (ci+0.5)*(endA-startA)/n;
+      const ax    = CX+Math.cos(angle)*ARC_R;
+      const ay    = CY+Math.sin(angle)*ARC_R;
+      const [mx,my] = projectMap(country.coord[0],country.coord[1],CX,CY,MAP_W,MAP_H);
+      const thick = Math.max(0.6,(country.val/220)*2.8);
+
+      ctx.beginPath();
+      ctx.moveTo(ax,ay);
+      ctx.bezierCurveTo(
+        CX+Math.cos(angle)*(ARC_R*0.45), CY+Math.sin(angle)*(ARC_R*0.45),
+        mx+(ax-mx)*0.12, my+(ay-my)*0.12,
+        mx, my
+      );
+      ctx.strokeStyle=col+'99'; ctx.lineWidth=thick; ctx.stroke();
+    });
+  });
+
+  // Draw arcs + labels on top
+  REGIONS.forEach(region=>{
+    const countries = AD.regions[region]||[];
+    const col       = AD.colors[region];
+    const { startA, endA, midA } = regMeta[region];
+    const n = countries.length;
+
+    // arc
+    ctx.beginPath();
+    ctx.arc(CX,CY,ARC_R,startA+0.01,endA-0.01);
+    ctx.strokeStyle=col; ctx.lineWidth=CW*0.009; ctx.stroke();
+
+    // region name — curved along inside of arc
+    ctx.save();
+    ctx.translate(CX+Math.cos(midA)*(ARC_R-REG_INSET), CY+Math.sin(midA)*(ARC_R-REG_INSET));
+    ctx.rotate(midA+Math.PI/2);
+    ctx.font=`800 ${Math.min(10,CW*0.011)}px 'Barlow Condensed',sans-serif`;
+    ctx.fillStyle=col; ctx.textAlign='center';
+    ctx.fillText(region.toUpperCase(),0,0);
+    ctx.restore();
+
+    // country labels + ticks
+    countries.forEach((country,ci)=>{
+      const angle = startA+(ci+0.5)*(endA-startA)/n;
+      const cos=Math.cos(angle), sin=Math.sin(angle);
+
+      // tick
+      ctx.beginPath();
+      ctx.moveTo(CX+cos*(ARC_R-2), CY+sin*(ARC_R-2));
+      ctx.lineTo(CX+cos*(ARC_R+TICK_LEN), CY+sin*(ARC_R+TICK_LEN));
+      ctx.strokeStyle=col+'bb'; ctx.lineWidth=0.8; ctx.stroke();
+
+      // dot on map
+      const [mx,my]=projectMap(country.coord[0],country.coord[1],CX,CY,MAP_W,MAP_H);
+      ctx.beginPath(); ctx.arc(mx,my,2.5,0,Math.PI*2);
+      ctx.fillStyle=col; ctx.fill();
+      ctx.strokeStyle='#141210'; ctx.lineWidth=0.7; ctx.stroke();
+
+      // label — font size derived from arc spacing so never overlaps
+      const arcSpacing = ((endA-startA)/n) * ARC_R; // px between neighbors
+      const fs = Math.min(arcSpacing * 0.72, Math.max(7, CW*0.009));
+      const lx=CX+cos*(ARC_R+LABEL_GAP);
+      const ly=CY+sin*(ARC_R+LABEL_GAP);
+      ctx.save();
+      ctx.translate(lx,ly);
+      let rot=angle+Math.PI/2;
+      if(cos<-0.05) rot+=Math.PI;
+      ctx.rotate(rot);
+      ctx.font=`500 ${fs}px 'Barlow Condensed',sans-serif`;
+      ctx.fillStyle='#e8e0d0'; ctx.textAlign='center';
+      ctx.fillText(`${country.label}  ${country.val}`,0,0);
+      ctx.restore();
+    });
+  });
+}
+
+render();
+window.addEventListener('resize', render);
+</script>
+</body>
+</html>
